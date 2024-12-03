@@ -1,23 +1,24 @@
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
+#define ll long long
+#define endl '\n'
 
 struct Process
 {
-    int pid;             // process id
-    int arrival_time;    // arrival time
-    int burst_time;      // burst time
-    int completion_time; // completion time
-    int turnaround_time; // turnaround time
-    int waiting_time;    // waiting time
+    int pid;
+    int arrival_time;
+    int burst_time;
+    int completion_time;
+    int turnaround_time;
+    int waiting_time;
 };
 
-void findWaitingTime(Process proc[], int n)
+void findWaitingTime(vector<Process> &proc)
 {
     // waiting time for first process is 0
     proc[0].waiting_time = 0;
 
-    // calculate waiting time for each process
-    for (int i = 1; i < n; i++)
+    for (size_t i = 1; i < proc.size(); i++)
     {
         proc[i].waiting_time = proc[i].turnaround_time - proc[i].burst_time;
         if (proc[i].waiting_time < 0)
@@ -27,46 +28,41 @@ void findWaitingTime(Process proc[], int n)
     }
 }
 
-void findTurnaroundTime(Process proc[], int n)
+void findTurnaroundTime(vector<Process> &proc)
 {
-    // calculate turnaround time for each process
-    for (int i = 0; i < n; i++)
+    for (auto &p : proc)
     {
-        proc[i].turnaround_time = proc[i].completion_time - proc[i].arrival_time;
+        p.turnaround_time = p.completion_time - p.arrival_time;
     }
 }
 
-void findCompletionTime(Process proc[], int n)
+void findCompletionTime(vector<Process> &proc)
 {
-    // calculate completion time for each process
-    proc[0].completion_time = proc[0].burst_time;
+    proc[0].completion_time = proc[0].arrival_time + proc[0].burst_time;
 
-    for (int i = 1; i < n; i++)
+    for (size_t i = 1; i < proc.size(); i++)
     {
-        proc[i].completion_time = proc[i - 1].completion_time + proc[i].burst_time;
+        proc[i].completion_time = max(proc[i - 1].completion_time, proc[i].arrival_time) + proc[i].burst_time;
     }
 }
 
-void findFCFS(Process proc[], int n)
+void findFCFS(vector<Process> &proc)
 {
-    // calculate waiting time, turnaround time, and completion time
-    findCompletionTime(proc, n);
-    findTurnaroundTime(proc, n);
-    findWaitingTime(proc, n);
+    findCompletionTime(proc);
+    findTurnaroundTime(proc);
+    findWaitingTime(proc);
 }
 
-void printFCFS(Process proc[], int n)
+void printFCFS(const vector<Process> &proc)
 {
     cout << "FCFS Scheduling:" << endl;
-    cout << "PID\tArrival Time\tBurst Time\tCompletion Time\tTurnaround "
-            "Time\tWaiting Time"
-         << endl;
+    cout << "PID\tArrival Time\tBurst Time\tCompletion Time\tTurnaround Time\tWaiting Time" << endl;
 
-    for (int i = 0; i < n; i++)
+    for (const auto &p : proc)
     {
-        cout << "P"<<proc[i].pid << "\t" << proc[i].arrival_time << "\t\t"
-             << proc[i].burst_time << "\t\t" << proc[i].completion_time << "\t\t"
-             << proc[i].turnaround_time << "\t\t" << proc[i].waiting_time << endl;
+        cout << "P" << p.pid << "\t" << p.arrival_time << "\t\t"
+             << p.burst_time << "\t\t" << p.completion_time << "\t\t"
+             << p.turnaround_time << "\t\t" << p.waiting_time << endl;
     }
 }
 
@@ -76,17 +72,17 @@ int main()
     cout << "Enter the number of processes: ";
     cin >> n;
 
-    Process proc[n];
+    vector<Process> proc(n);
 
     for (int i = 0; i < n; i++)
     {
         proc[i].pid = i + 1;
-        cout << "Enter arrival time and burst time for process " << proc[i].pid << ": ";
+        cout << "Enter arrival time and burst time for process P" << proc[i].pid << ": ";
         cin >> proc[i].arrival_time >> proc[i].burst_time;
     }
 
-    findFCFS(proc, n);
-    printFCFS(proc, n);
+    findFCFS(proc);
+    printFCFS(proc);
 
     return 0;
 }

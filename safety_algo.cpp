@@ -52,7 +52,9 @@ bool isSafe(vector<Process> &processes, vector<int> &available, int m)
                 if (canProceed)
                 {
                     for (int j = 0; j < m; j++)
+                    {
                         work[j] += process.allocation[j];
+                    }
 
                     process.finished = true;
                     safeSequence.push_back(process.id + 1);
